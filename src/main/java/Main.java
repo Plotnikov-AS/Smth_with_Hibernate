@@ -12,8 +12,9 @@ public class Main {
         SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
 
         Session session = sessionFactory.openSession();
-        Course course =  session.get(Course.class, 1);
-        System.out.println(course.getName());
+        Course course =  session.get(Course.class, 10);
+
+        System.out.println(course.getDescription());
 
         sessionFactory.close();
     }
