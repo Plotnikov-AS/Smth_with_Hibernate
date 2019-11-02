@@ -1,36 +1,21 @@
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 
-@Embeddable
+@Entity
 @Table(name = "purchaselist")
 public class PurchaseList {
-    @Column(name = "student_name")
-    private String studentName;
-
-    @Column(name = "course_name")
-    private String courseName;
+    @EmbeddedId
+    private PurchaseListPK id;
 
     private int price;
 
     @Column(name = "subscription_date")
     private Date subscriptionDate;
 
-    public String getStudentName() {
-        return studentName;
-    }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
+    /**
+     * Getters and setters
+     */
     public int getPrice() {
         return price;
     }
@@ -46,4 +31,14 @@ public class PurchaseList {
     public void setSubscriptionDate(Date subscriptionDate) {
         this.subscriptionDate = subscriptionDate;
     }
+
+    public PurchaseListPK getId() {
+        return id;
+    }
+
+    public void setId(PurchaseListPK id) {
+        this.id = id;
+    }
 }
+
+

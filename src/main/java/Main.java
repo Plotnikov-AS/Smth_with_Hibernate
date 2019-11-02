@@ -5,6 +5,18 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.transform.Transformers;
+
+import javax.management.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,25 +26,51 @@ public class Main {
 
         Session session = sessionFactory.openSession();
 
-        Course course1 = session.get(Course.class, 1);
+        CriteriaBuilder builder = session.getCriteriaBuilder();
 
-        System.out.println("Студенты, обучающиеся на курсе " + course1.getName() + ":");
-        for (Student student : course1.getStudents()){
-            System.out.println(student.getName());
+        //PurchaseList query
+        CriteriaQuery<PurchaseList> purchaseListCriteriaQuery = builder.createQuery(PurchaseList.class);
+        Root<PurchaseList> purchaseListRoot = purchaseListCriteriaQuery.from(PurchaseList.class);
+
+        //Students query
+        CriteriaQuery<Student> studentCriteriaQuery = builder.createQuery(Student.class);
+        Root<Student> studentRoot = studentCriteriaQuery.from(Student.class);
+
+        //Course query
+        CriteriaQuery<Course> courseCriteriaQuery = builder.createQuery(Course.class);
+        Root<Course> courseRoot = courseCriteriaQuery.from(Course.class);
+
+        purchaseListCriteriaQuery.select(purchaseListRoot);
+        List<PurchaseList> purchaseLists = session.createQuery(purchaseListCriteriaQuery).getResultList();
+
+        List<FullPurchaseInfo> fullPurchaseInfos = new ArrayList<>();
+        int studentId;
+        String studentName;
+        int courseId;
+        String courseName;
+        int coursePrice;
+        Date subDate;
+
+        for (PurchaseList list : purchaseLists){
+            studentName = list.getId().getStudentName();
+
+            studentCriteriaQuery.select(studentRoot).where(builder.equal(studentRoot.get("name"), studentName));
+            studentId = session.createQuery(studentCriteriaQuery).getSingleResult().getId();
+
+            courseName = list.getId().getCourseName();
+
+            courseCriteriaQuery.select(courseRoot).where(builder.equal(courseRoot.get("name"), courseName));
+            courseId = session.createQuery(courseCriteriaQuery).getSingleResult().getId();
+
+            coursePrice = list.getPrice();
+            subDate = list.getSubscriptionDate();
+
+            fullPurchaseInfos.add(new FullPurchaseInfo(studentId, studentName, courseId, courseName, coursePrice, subDate));
         }
 
-        Student student = session.get(Student.class, 5);
-        System.out.println("Курсы, на которые подписан студент " + student.getName() + ":");
-        for (Course course : student.getCourses()){
-            System.out.println(course.getName());
+        for (FullPurchaseInfo info : fullPurchaseInfos){
+            info.print();
         }
-
-        Teacher teacher = session.get(Teacher.class, 10);
-        System.out.println("Преподаватель " + teacher.getName() + " ведет курсы:");
-        for (Course course : teacher.getCourses()){
-            System.out.println(course.getName());
-        }
-
         sessionFactory.close();
     }
 }
