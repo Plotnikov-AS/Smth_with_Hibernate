@@ -12,6 +12,11 @@ public class PurchaseList {
     @Column(name = "subscription_date")
     private Date subscriptionDate;
 
+    @Column(name = "student_id", nullable = true)
+    private Integer studentId;
+
+    @Column(name = "course_id", nullable = true)
+    private Integer courseId;
 
     /**
      * Getters and setters
@@ -38,6 +43,22 @@ public class PurchaseList {
 
     public void setId(PurchaseListPK id) {
         this.id = id;
+    }
+
+    public Integer getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Integer studentId) {
+        this.studentId = studentId;
+    }
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Integer courseId) {
+        this.courseId = courseId;
     }
 }
 

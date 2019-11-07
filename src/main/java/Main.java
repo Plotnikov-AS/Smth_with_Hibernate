@@ -25,6 +25,7 @@ public class Main {
         SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
 
         Session session = sessionFactory.openSession();
+        session.beginTransaction();
 
         CriteriaBuilder builder = session.getCriteriaBuilder();
 
@@ -41,36 +42,30 @@ public class Main {
         Root<Course> courseRoot = courseCriteriaQuery.from(Course.class);
 
         purchaseListCriteriaQuery.select(purchaseListRoot);
-        List<PurchaseList> purchaseLists = session.createQuery(purchaseListCriteriaQuery).getResultList();
+        List<PurchaseList> purchaseListItems = session.createQuery(purchaseListCriteriaQuery).getResultList();
 
-        List<FullPurchaseInfo> fullPurchaseInfos = new ArrayList<>();
         int studentId;
         String studentName;
         int courseId;
         String courseName;
-        int coursePrice;
-        Date subDate;
 
-        for (PurchaseList list : purchaseLists){
-            studentName = list.getId().getStudentName();
-
+        for (PurchaseList item : purchaseListItems){
+            //Get student info (name, id)
+            studentName = item.getId().getStudentName();
             studentCriteriaQuery.select(studentRoot).where(builder.equal(studentRoot.get("name"), studentName));
             studentId = session.createQuery(studentCriteriaQuery).getSingleResult().getId();
 
-            courseName = list.getId().getCourseName();
-
+            //Get course info (name, id)
+            courseName = item.getId().getCourseName();
             courseCriteriaQuery.select(courseRoot).where(builder.equal(courseRoot.get("name"), courseName));
             courseId = session.createQuery(courseCriteriaQuery).getSingleResult().getId();
 
-            coursePrice = list.getPrice();
-            subDate = list.getSubscriptionDate();
-
-            fullPurchaseInfos.add(new FullPurchaseInfo(studentId, studentName, courseId, courseName, coursePrice, subDate));
+            //Add id`s to database
+            item.setStudentId(studentId);
+            item.setCourseId(courseId);
+            session.save(item);
         }
-
-        for (FullPurchaseInfo info : fullPurchaseInfos){
-            info.print();
-        }
+        session.getTransaction().commit();
         sessionFactory.close();
     }
 }

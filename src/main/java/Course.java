@@ -38,6 +38,9 @@ public class Course {
     private List<Student> students;
 
 
+    /**
+     * Getters and setters
+     */
 
     public int getId() {
         return id;

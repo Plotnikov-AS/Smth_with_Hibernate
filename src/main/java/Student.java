@@ -22,6 +22,10 @@ public class Student {
             inverseJoinColumns = {@JoinColumn(name = "course_id")})
     private List<Course> courses;
 
+    /**
+     * Getters and setters
+     */
+
     public int getId() {
         return id;
     }

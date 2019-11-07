@@ -18,6 +18,10 @@ public class PurchaseListPK implements Serializable {
         this.courseName = courseName;
     }
 
+    /**
+     * Getters and setters
+     */
+
     public String getStudentName() {
         return studentName;
     }
